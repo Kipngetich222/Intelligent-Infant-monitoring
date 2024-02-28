@@ -13,11 +13,7 @@
         <h1>Non-Intrusive Infant Care System</h1>
     </header>
     <main>
-        <!-- Alarm Indicator -->
-<div id="alarm-indicator" class="alarm-hidden">
-    <div class="alarm-exclamation">!</div>
-</div>
-
+        
         <!-- Cartoon SVG -->
         <svg id="movement-cartoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" style="display: none;">
             <!-- Head -->
@@ -48,16 +44,17 @@
                 <li><strong>Respiration Rate:</strong> <span id="respiration-rate">--</span></li>
                 <li><strong>Oxygen Saturation:</strong> <span id="oxygen-saturation">--</span></li>
                 <li><strong>Movement:</strong> <span id="movement">--</span></li>
+                
             </ul>
-        </section>
-        <!-- AI Insights -->
+        <!-- </section>
+         AI Insights 
         <section class="ai-insights">
             <h2>AI Insights</h2>
             <ul>
                 <li><strong>Anomaly Indicator:</strong> <span id="anomaly-indicator">--</span></li>
                 <li><strong>Predicted Trend:</strong> <span id="predicted-trend">--</span></li>
             </ul>
-        </section>
+        </section> -->
     </main>
 
     <script>
@@ -200,63 +197,6 @@
                 });
             }
         }
-
-// Function to show the alarm indicator
-function showAlarm() {
-    document.getElementById('elementId').style.display = 'block'; // or 'flex', 'inline', etc.
-
-}
-
-// Fetch Temperature Data
-fetch('/get-temperature')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('temperature').textContent = `${data.temperature} °C`;
-        // Example condition for abnormal temperature
-        if (data.temperature < 36.5 || data.temperature > 37.5) {
-            showAlarm();
-        }
-    })
-    .catch(error => console.error('Error fetching temperature:', error));
-
-// Fetch Respiration Rate Data
-fetch('/get-respiration-rate')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('respiration-rate').textContent = `${data.respiration_rate} breaths/min`;
-        // Example condition for abnormal respiration rate
-        if (data.respiration_rate < 25 || data.respiration_rate > 50) {
-            showAlarm();
-        }
-    })
-    .catch(error => console.error('Error fetching respiration rate:', error));
-
-// Fetch Oxygen Saturation Data
-fetch('/get-oxygen-saturation')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('oxygen-saturation').textContent = `${data.oxygen_saturation}%`;
-        // Example condition for abnormal oxygen saturation
-        if (data.oxygen_saturation < 95) {
-            showAlarm();
-        }
-    })
-    .catch(error => console.error('Error fetching oxygen saturation:', error));
-
-// Optionally, if you have a movement sensor or another sensor:
-// Fetch Movement Data
-fetch('/get-movement')
-    .then(response => response.json())
-    .then(data => {
-        // Assuming 'movementDetected' is a boolean indicating movement
-        if (data.movementDetected) {
-            // Possibly show a different or additional alert for movement
-            document.getElementById('movement').textContent = "Movement Detected!";
-        }
-    })
-    .catch(error => console.error('Error fetching movement data:', error));
-
-
 
         // Initial chart update
         updateSensorData();
