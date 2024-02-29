@@ -13,8 +13,26 @@
         <h1>Non-Intrusive Infant Care System</h1>
     </header>
     <main>
-        
-        <!-- Cartoon SVG -->
+        <!-- Alarm Indicator -->
+<div id="alarm-indicator" class="alarm-hidden">
+    <div class="alarm-exclamation">!</div>
+</div>
+
+        <!-- Sensor Data Display -->
+        <section class="sensor-data">
+            <h2>Sensor Data</h2>
+            <div class="chart-container" style="width: 90%; height: 300px;">
+                <canvas id="sensor-chart"></canvas> <!-- Canvas element for the chart -->
+            </div>
+            <ul>
+                <li><strong>Temperature:</strong> <span id="temperature">--</span></li>
+                <li><strong>Respiration Rate:</strong> <span id="respiration-rate">--</span></li>
+                <li><strong>Oxygen Saturation:</strong> <span id="oxygen-saturation">--</span></li>
+                <li><strong>Movement:</strong> <span id="movement">--</span></li>
+                
+            </ul>
+
+            <!-- Cartoon SVG -->
         <svg id="movement-cartoon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" style="display: none;">
             <!-- Head -->
             <circle cx="50" cy="30" r="20" fill="yellow" stroke="black" stroke-width="2"/>
@@ -32,70 +50,77 @@
             <line x1="45" y1="80" x2="40" y2="90" stroke="black" stroke-width="2"/>
             <line x1="55" y1="80" x2="60" y2="90" stroke="black" stroke-width="2"/>
         </svg>
-
-        <!-- Sensor Data Display -->
-        <section class="sensor-data">
-            <h2>Sensor Data</h2>
-            <div class="chart-container" style="width: 90%; height: 300px;">
-                <canvas id="sensor-chart"></canvas> <!-- Canvas element for the chart -->
-            </div>
-            <ul>
-                <li><strong>Temperature:</strong> <span id="temperature">--</span></li>
-                <li><strong>Respiration Rate:</strong> <span id="respiration-rate">--</span></li>
-                <li><strong>Oxygen Saturation:</strong> <span id="oxygen-saturation">--</span></li>
-                <li><strong>Movement:</strong> <span id="movement">--</span></li>
-                
-            </ul>
-        <!-- </section>
-         AI Insights 
+        </section>
+         <!-- AI Insights 
         <section class="ai-insights">
             <h2>AI Insights</h2>
             <ul>
                 <li><strong>Anomaly Indicator:</strong> <span id="anomaly-indicator">--</span></li>
                 <li><strong>Predicted Trend:</strong> <span id="predicted-trend">--</span></li>
             </ul>
-        </section> -->
+        </section>  -->
     </main>
 
-    <!-- ... (previous HTML code) ... -->
+    <script>
+        
+// Function to show the alarm indicator
+function showAlarm() {
+    var alarmIndicator = document.getElementById('alarm-indicator');
+    alarmIndicator.style.display = 'flex';
+    // Optionally, you can add animation or styling to the alarm indicator here
+    
+    // Set a timer to hide the alarm indicator after 5 seconds
+    setTimeout(function() {
+        alarmIndicator.style.display = 'none';
+    }, 5000); // 5000 milliseconds = 5 seconds
+}
 
-<script>
-    // Function to fetch sensor data and update the frontend
-    function updateSensorData() {
-        // Fetch Sensor Data
-        fetch('/get-sensor-data')
-            .then(response => response.json())
-            .then(data => {
-                // Update temperature
-                var temperatureSpan = document.getElementById('temperature');
-                temperatureSpan.textContent = `${data.temperature} °C`;
-                // Check for abnormal temperature
-                if (data.temperature < 36.0 || data.temperature > 38.0) {
-                    temperatureSpan.style.color = 'red';
-                } else {
-                    temperatureSpan.style.color = 'black';
-                }
 
-                // Update respiration rate
-                var respirationRateSpan = document.getElementById('respiration-rate');
-                respirationRateSpan.textContent = `${data.respiration_rate} breaths/min`;
-                // Check for abnormal respiration rate
-                if (data.respiration_rate < 25 || data.respiration_rate > 50) {
-                    respirationRateSpan.style.color = 'red';
-                } else {
-                    respirationRateSpan.style.color = 'black';
-                }
+// Function to fetch sensor data and update the frontend
+function updateSensorData() {
+    // Fetch Sensor Data
+    fetch('/get-sensor-data')
+        .then(response => response.json())
+        .then(data => {
+            // Update temperature
+            var temperatureSpan = document.getElementById('temperature');
+            temperatureSpan.textContent = `${data.temperature} °C`;
+            // Check for abnormal temperature
+            if (data.temperature < 36.0 || data.temperature > 38.0) {
+                temperatureSpan.style.color = 'red';
+                showAlarm(); // Call showAlarm() if temperature is abnormal
+            } else {
+                temperatureSpan.style.color = 'black';
+            }
 
-                // Update oxygen saturation
-                var oxygenSaturationSpan = document.getElementById('oxygen-saturation');
-                oxygenSaturationSpan.textContent = `${data.oxygen_saturation}%`;
-                // Check for abnormal oxygen saturation
-                if (data.oxygen_saturation < 90 || data.oxygen_saturation > 100) {
-                    oxygenSaturationSpan.style.color = 'red';
-                } else {
-                    oxygenSaturationSpan.style.color = 'black';
-                }
+            // Update respiration rate
+            var respirationRateSpan = document.getElementById('respiration-rate');
+            respirationRateSpan.textContent = `${data.respiration_rate} breaths/min`;
+            // Check for abnormal respiration rate
+            if (data.respiration_rate < 25 || data.respiration_rate > 50) {
+                respirationRateSpan.style.color = 'red';
+                showAlarm(); // Call showAlarm() if respiration rate is abnormal
+            } else {
+                respirationRateSpan.style.color = 'black';
+            }
 
+            // Update oxygen saturation
+            var oxygenSaturationSpan = document.getElementById('oxygen-saturation');
+            oxygenSaturationSpan.textContent = `${data.oxygen_saturation}%`;
+            // Check for abnormal oxygen saturation
+            if (data.oxygen_saturation < 90 || data.oxygen_saturation > 100) {
+                oxygenSaturationSpan.style.color = 'red';
+                showAlarm(); // Call showAlarm() if oxygen saturation is abnormal
+            } else {
+                oxygenSaturationSpan.style.color = 'black';
+            }
+
+            // Update movement
+            var movementSpan = document.getElementById('movement');
+            movementSpan.textContent = data.movement ? 'Movement Detected' : 'No Movement Detected';
+            // Show/hide movement cartoon
+            var movementCartoon = document.getElementById('movement-cartoon');
+            movementCartoon.style.display = data.movement ? 'block' : 'none';
                 // Update movement
                 var movementSpan = document.getElementById('movement');
                 movementSpan.textContent = data.movement ? 'Movement Detected' : 'No Movement Detected';
@@ -103,7 +128,7 @@
                 var movementCartoon = document.getElementById('movement-cartoon');
                 movementCartoon.style.display = data.movement ? 'block' : 'none';
 
-                // Update chart with new data
+                    // Update chart with new data
                 updateChart(data);
             })
             .catch(error => console.error('Error fetching sensor data:', error));
