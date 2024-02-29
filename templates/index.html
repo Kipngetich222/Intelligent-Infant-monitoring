@@ -57,152 +57,150 @@
         </section> -->
     </main>
 
-    <script>
-        // Function to fetch sensor data and update the frontend
-        function updateSensorData() {
-            // Fetch Sensor Data
-            fetch('/get-sensor-data')
-                .then(response => response.json())
-                .then(data => {
-                    // Update temperature
-                    var temperatureSpan = document.getElementById('temperature');
-                    temperatureSpan.textContent = `${data.temperature} °C`;
-                    // Check for abnormal temperature
-                    if (data.temperature < 36.0 || data.temperature > 38.0) {
-                        temperatureSpan.style.color = 'red';
-                    } else {
-                        temperatureSpan.style.color = 'black';
-                    }
+    <!-- ... (previous HTML code) ... -->
 
-                    // Update respiration rate
-                    var respirationRateSpan = document.getElementById('respiration-rate');
-                    respirationRateSpan.textContent = `${data.respiration_rate} breaths/min`;
-                    // Check for abnormal respiration rate
-                    if (data.respiration_rate < 25 || data.respiration_rate > 50) {
-                        respirationRateSpan.style.color = 'red';
-                    } else {
-                        respirationRateSpan.style.color = 'black';
-                    }
+<script>
+    // Function to fetch sensor data and update the frontend
+    function updateSensorData() {
+        // Fetch Sensor Data
+        fetch('/get-sensor-data')
+            .then(response => response.json())
+            .then(data => {
+                // Update temperature
+                var temperatureSpan = document.getElementById('temperature');
+                temperatureSpan.textContent = `${data.temperature} °C`;
+                // Check for abnormal temperature
+                if (data.temperature < 36.0 || data.temperature > 38.0) {
+                    temperatureSpan.style.color = 'red';
+                } else {
+                    temperatureSpan.style.color = 'black';
+                }
 
-                    // Update oxygen saturation
-                    var oxygenSaturationSpan = document.getElementById('oxygen-saturation');
-                    oxygenSaturationSpan.textContent = `${data.oxygen_saturation}%`;
-                    // Check for abnormal oxygen saturation
-                    if (data.oxygen_saturation < 90 || data.oxygen_saturation > 100) {
-                        oxygenSaturationSpan.style.color = 'red';
-                    } else {
-                        oxygenSaturationSpan.style.color = 'black';
-                    }
+                // Update respiration rate
+                var respirationRateSpan = document.getElementById('respiration-rate');
+                respirationRateSpan.textContent = `${data.respiration_rate} breaths/min`;
+                // Check for abnormal respiration rate
+                if (data.respiration_rate < 25 || data.respiration_rate > 50) {
+                    respirationRateSpan.style.color = 'red';
+                } else {
+                    respirationRateSpan.style.color = 'black';
+                }
 
-                    // Update movement
-                    var movementSpan = document.getElementById('movement');
-                    movementSpan.textContent = data.movement ? 'Movement Detected' : 'No Movement Detected';
-                    // Show/hide movement cartoon
-                    var movementCartoon = document.getElementById('movement-cartoon');
-                    movementCartoon.style.display = data.movement ? 'block' : 'none';
+                // Update oxygen saturation
+                var oxygenSaturationSpan = document.getElementById('oxygen-saturation');
+                oxygenSaturationSpan.textContent = `${data.oxygen_saturation}%`;
+                // Check for abnormal oxygen saturation
+                if (data.oxygen_saturation < 90 || data.oxygen_saturation > 100) {
+                    oxygenSaturationSpan.style.color = 'red';
+                } else {
+                    oxygenSaturationSpan.style.color = 'black';
+                }
 
-                    // Update chart with new data
-                    updateChart(data);
-                })
-                .catch(error => console.error('Error fetching sensor data:', error));
-        }
-        
-        // Function to generate random data for the chart
-        function generateChartData(data) {
-            var labels = [];
-            var temperatureData = [];
-            var respirationRateData = [];
-            var oxygenSaturationData = [];
-            var movementData = [];
+                // Update movement
+                var movementSpan = document.getElementById('movement');
+                movementSpan.textContent = data.movement ? 'Movement Detected' : 'No Movement Detected';
+                // Show/hide movement cartoon
+                var movementCartoon = document.getElementById('movement-cartoon');
+                movementCartoon.style.display = data.movement ? 'block' : 'none';
 
-            for (var i = 0; i < 10; i++) { // Generate data for 10 time points
-                labels.push('Time ' + i);
-                temperatureData.push(data.temperature);
-                respirationRateData.push(data.respiration_rate);
-                oxygenSaturationData.push(data.oxygen_saturation);
-                movementData.push(data.movement);
-            }
+                // Update chart with new data
+                updateChart(data);
+            })
+            .catch(error => console.error('Error fetching sensor data:', error));
+    }
 
-            return {
-                labels: labels,
-                temperatureData: temperatureData,
-                respirationRateData: respirationRateData,
-                oxygenSaturationData: oxygenSaturationData,
-                movementData: movementData
-            };
-        }
+    // Function to generate current timestamp
+    function getCurrentTimestamp() {
+        var now = new Date();
+        return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+    }
 
-        // Function to update the chart with new data
-        function updateChart(data) {
-            var chartData = generateChartData(data);
+    // Function to generate random data for the chart
+    function generateChartData(data) {
+        var timestamp = getCurrentTimestamp();
+        return {
+            label: timestamp,
+            temperatureData: data.temperature,
+            respirationRateData: data.respiration_rate,
+            oxygenSaturationData: data.oxygen_saturation,
+            movementData: data.movement ? 1 : 0
+        };
+    }
 
-            // Create or update the chart
-            if (window.myChart) {
-                // Update existing chart
-                window.myChart.data.labels = chartData.labels;
-                window.myChart.data.datasets[0].data = chartData.temperatureData;
-                window.myChart.data.datasets[1].data = chartData.respirationRateData;
-                window.myChart.data.datasets[2].data = chartData.oxygenSaturationData;
-                window.myChart.data.datasets[3].data = chartData.movementData;
-                window.myChart.update();
-            } else {
-                // Create new chart
-                var ctx = document.getElementById('sensor-chart').getContext('2d');
-                window.myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: chartData.labels,
-                        datasets: [{
-                            label: 'Temperature (°C)',
-                            data: chartData.temperatureData,
-                            borderColor: 'rgb(255, 99, 132)',
-                            fill: false
-                        }, {
-                            label: 'Respiration Rate (breaths/min)',
-                            data: chartData.respirationRateData,
-                            borderColor: 'rgb(54, 162, 235)',
-                            fill: false
-                        }, {
-                            label: 'Oxygen Saturation (%)',
-                            data: chartData.oxygenSaturationData,
-                            borderColor: 'rgb(75, 192, 192)',
-                            fill: false
-                        }, {
-                            label: 'Movement',
-                            data: chartData.movementData.map(movement => movement ? 1 : 0), // Convert movement data to binary (0 or 1)
-                            borderColor: 'rgb(255, 206, 86)',
-                            fill: false
+    // Function to update the chart with new data
+    function updateChart(data) {
+        var chartData = generateChartData(data);
+
+        // Create or update the chart
+        if (window.myChart) {
+            // Update existing chart
+            window.myChart.data.labels.push(chartData.label);
+            window.myChart.data.datasets[0].data.push(chartData.temperatureData);
+            window.myChart.data.datasets[1].data.push(chartData.respirationRateData);
+            window.myChart.data.datasets[2].data.push(chartData.oxygenSaturationData);
+            window.myChart.data.datasets[3].data.push(chartData.movementData);
+            window.myChart.update();
+        } else {
+            // Create new chart
+            var ctx = document.getElementById('sensor-chart').getContext('2d');
+            window.myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [chartData.label],
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: [chartData.temperatureData],
+                        borderColor: 'rgb(255, 99, 132)',
+                        fill: false
+                    }, {
+                        label: 'Respiration Rate (breaths/min)',
+                        data: [chartData.respirationRateData],
+                        borderColor: 'rgb(54, 162, 235)',
+                        fill: false
+                    }, {
+                        label: 'Oxygen Saturation (%)',
+                        data: [chartData.oxygenSaturationData],
+                        borderColor: 'rgb(75, 192, 192)',
+                        fill: false
+                    }, {
+                        label: 'Movement',
+                        data: [chartData.movementData],
+                        borderColor: 'rgb(255, 206, 86)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Value'
+                            }
                         }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            xAxes: [{
-                                display: true,
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Time'
-                                }
-                            }],
-                            yAxes: [{
-                                display: true,
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Value'
-                                }
-                            }]
-                        }
                     }
-                });
-            }
+                }
+            });
         }
+    }
 
-        // Initial chart update
-        updateSensorData();
+    // Initial chart update
+    updateSensorData();
 
-        // Set an interval to update the sensor data and chart periodically
-        setInterval(updateSensorData, 10000); // Update every 10 seconds
-    </script>
+    // Set an interval to update the sensor data and chart periodically
+    setInterval(updateSensorData, 10000); // Update every 10 seconds
+</script>
+
+<!-- ... (remaining HTML code) ... -->
+
 </body>
 </html>
