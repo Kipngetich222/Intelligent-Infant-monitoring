@@ -36,7 +36,7 @@ def get_sensor_data():
         oxygen_saturation = random.randint(*ABNORMAL_OXYGEN_SATURATION_RANGE)
     
     # Generate movement data once in a while
-    movement = random.randint(0, 3) if random.random() < 0.05 else MOVEMENT  # 20% chance of generating new movement data
+    movement = random.randint(0, 3) if random.random() < 0.5 else MOVEMENT  # 20% chance of generating new movement data
     
     return jsonify(temperature=temperature, respiration_rate=respiration_rate, oxygen_saturation=oxygen_saturation, movement=movement)
 
