@@ -1,17 +1,17 @@
 from flask import Flask, render_template, jsonify
 import random
 import numpy as np
-from model import build_nn_model, preprocess_data, update_model
+from model import build_nn_model, preprocess_data, update_model, analyze_trend
 
 app = Flask(__name__, static_url_path='/static')
 
 # Define global variables
-INPUT_SIZE = 4  # Temperature, Respiration, Oxygen Saturation, Movement
 MODEL_UPDATE_THRESHOLD = 10  # Update the model every 10 data points
 
 # Initialize model
 model = build_nn_model()
 data_counter = 0  # Counter to track the number of data points
+data_history = []  # To store historical data
 
 # Simulate realistic ranges for infant vital signs
 NORMAL_TEMPERATURE_RANGE = (36.5, 37.5)  # Temperature range in degrees Celsius
@@ -32,7 +32,7 @@ def home():
 
 @app.route('/get-sensor-data')
 def get_sensor_data():
-    global model, data_counter
+    global model, data_counter, data_history
     
     # Simulate sensor data within the specified ranges
     temperature = round(random.uniform(*NORMAL_TEMPERATURE_RANGE), 1)
@@ -51,7 +51,8 @@ def get_sensor_data():
     movement = random.randint(0, 3) if random.random() < 0.5 else MOVEMENT  # 20% chance of generating new movement data
 
     # Preprocess the data
-    data = preprocess_data([temperature, respiration_rate, oxygen_saturation, movement])
+    current_data = [temperature, respiration_rate, oxygen_saturation, movement]
+    data = preprocess_data(current_data)
     
     # Make prediction using the model
     prediction = model.predict(data)
@@ -64,7 +65,27 @@ def get_sensor_data():
     else:
         data_counter += 1
     
-    return jsonify(temperature=temperature, respiration_rate=respiration_rate, oxygen_saturation=oxygen_saturation, movement=movement, prediction=float(prediction[0]))
+    # Analyze trend and provide prediction and suggestion
+    pred, suggestion = analyze_trend(data_history, current_data)
+    
+    # Append current data to history
+    data_history.append(current_data)
+    
+    # Prepare AI insights
+    ai_insights = {
+        "prediction": pred,
+        "suggestion": suggestion
+    }
+    
+    # Return AI insights along with sensor data
+    return jsonify(
+        temperature=temperature,
+        respiration_rate=respiration_rate,
+        oxygen_saturation=oxygen_saturation,
+        movement=movement,
+        ai_insights=ai_insights  
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True)
