@@ -57,21 +57,33 @@
             <div id="prediction"><strong>Prediction:</strong> --</div>
             <div id="suggestion"><strong>Suggestion:</strong> --</div>
         </section> 
+        <!--Alarm sound-->
+        <audio id="alarmSound">
+            <source src="emergency-alarm-with-reverb-29431.mp3" type="audio/mpeg">
+            Your browser does not support the audio tag.
+        </audio>
+        
 
     </main>
 
     <script>
         // Function to show the alarm indicator
         function showAlarm() {
-            var alarmIndicator = document.getElementById('alarm-indicator');
-            alarmIndicator.style.display = 'flex';
-            // Optionally, you can add animation or styling to the alarm indicator here
+              var alarmIndicator = document.getElementById('alarm-indicator');
+               alarmIndicator.style.display = 'flex';
 
-            // Set a timer to hide the alarm indicator after 5 seconds
-            setTimeout(function() {
-                alarmIndicator.style.display = 'none';
-            }, 5000); // 5000 milliseconds = 5 seconds
-        }
+               // Play the alarm sound
+               var alarmSound = document.getElementById('alarmSound');
+               alarmSound.play();
+
+               
+
+               // Set a timer to hide the alarm indicator after 5 seconds
+               setTimeout(function () {
+               alarmIndicator.style.display = 'none';
+              }, 5000); // 5000 milliseconds = 5 seconds
+         }
+
 
         // Function to fetch sensor data and update the frontend
         function updateSensorData() {
